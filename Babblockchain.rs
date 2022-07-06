@@ -1,4 +1,4 @@
-//
+
 
 use chrono::Utc;
 use serde_json;
@@ -30,8 +30,6 @@ impl Block {
     }
 }
 
-/// Caclulate the hash from input data.
-/// Use sha3 - sha256 algorithm.
 fn calculate_hash(index: u32, time: &str, pre_hash: &[u8], data: &str) -> Vec<u8> {
     let mut hasher = Sha3_256::default();
     let index_byte: [u8; 4] = unsafe { transmute(index.to_le()) };
@@ -48,8 +46,7 @@ pub struct BlockChain {
 }
 
 impl BlockChain {
-    /// Create a new block chain instance.
-    /// All blocks are stored into a vector.
+    
     pub fn new() -> Self {
         let mut chain = Vec::new();
         chain.push(BlockChain::generate_genesis_block());
@@ -57,7 +54,7 @@ impl BlockChain {
     }
 
     fn generate_genesis_block() -> Block {
-        // Hardcoded hash and data of genesis block.
+        
         let time = format!("{}", Utc::now());
         let pre_hash = Vec::<u8>::new();
         let data = "Genesis block.".to_string();
@@ -68,7 +65,7 @@ impl BlockChain {
         Block::new(0, time, hash, pre_hash, data)
     }
 
-    /// Generate next block, return a block.
+    
     pub fn generate_next_block<T: Into<String>>(&self, data: T) -> Block {
         let pre_block = self.chain.last().unwrap();
         let index = pre_block.index + 1;
@@ -80,7 +77,7 @@ impl BlockChain {
     }
 
     pub fn add_new_block(&mut self, block: Block) -> bool {
-        // Get the latest block.
+        
         let is_valid;
         {
             let latest_block = self.chain.last().unwrap();
@@ -109,7 +106,7 @@ impl BlockChain {
     }
 }
 
-/// Validate the new generated block with this chain.
+
 pub fn validate_block(pre_block: &Block, block: &Block) -> bool {
     let recalc_hash = calculate_hash(block.index, &block.time, &block.pre_hash, &block.data);
     if pre_block.index + 1 != block.index {
@@ -125,9 +122,9 @@ pub fn validate_block(pre_block: &Block, block: &Block) -> bool {
     true
 }
 
-/// Validate a block chain, iterate a blockchain and validate all blocks.
+
 fn validate_chain(block_chain: &BlockChain) -> bool {
-    // TODO: make the chain iterable.
+    
     let mut pre_block = block_chain.chain.iter().next().unwrap();
     for next_block in block_chain.chain.iter() {
         if !validate_block(pre_block, next_block) {
